@@ -13,7 +13,12 @@ class SoalController extends Controller
      */
     public function index()
     {
-        //
+        $soal = Soal::with('materi.kelas')->get();
+        return response()->json([
+            'success' => true,
+            'message' => 'Daftar soal berhasil diambil',
+            'data' => $soal
+        ]);
     }
 
     /**
@@ -29,7 +34,14 @@ class SoalController extends Controller
      */
     public function store(StoreSoalRequest $request)
     {
-        //
+        $soal = Soal::create($request->validated());
+        $soal->load('materi.kelas');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Soal berhasil dibuat',
+            'data' => $soal
+        ], 201);
     }
 
     /**
@@ -37,7 +49,12 @@ class SoalController extends Controller
      */
     public function show(Soal $soal)
     {
-        //
+        $soal->load('materi.kelas');
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail soal berhasil diambil',
+            'data' => $soal
+        ]);
     }
 
     /**
@@ -53,7 +70,14 @@ class SoalController extends Controller
      */
     public function update(UpdateSoalRequest $request, Soal $soal)
     {
-        //
+        $soal->update($request->validated());
+        $soal->load('materi.kelas');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Soal berhasil diupdate',
+            'data' => $soal
+        ]);
     }
 
     /**
@@ -61,6 +85,21 @@ class SoalController extends Controller
      */
     public function destroy(Soal $soal)
     {
-        //
+        $soal->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Soal berhasil dihapus'
+        ]);
+    }
+
+    public function getByMateri($materi_id)
+    {
+        $soal = Soal::where('materi_id', $materi_id)->get();
+        return response()->json([
+            'success' => true,
+            'message' => 'Soal per materi berhasil diambil',
+            'data' => $soal
+        ]);
     }
 }

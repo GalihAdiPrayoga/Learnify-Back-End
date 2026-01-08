@@ -32,6 +32,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('materi', MateriController::class);
         Route::apiResource('soal', SoalController::class);
         Route::apiResource('hasil-ujian', HasilUjianController::class);
+
+        // Admin dapat mengakses materi by kelas untuk form soal
+        Route::get('/materi/kelas/{kelas_id}', [MateriController::class, 'getByKelas']);
     });
 
     // User routes

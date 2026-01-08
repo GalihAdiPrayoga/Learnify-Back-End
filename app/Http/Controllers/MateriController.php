@@ -99,24 +99,31 @@ class MateriController extends Controller
      */
     public function getByKelas($kelas_id)
     {
-        // Validasi kelas exists
         $kelas = Kelas::find($kelas_id);
 
         if (!$kelas) {
             return response()->json([
                 'success' => false,
-                'message' => 'Kelas tidak ditemukan'
+                'message' => 'Kelas tidak ditemukan',
+                'data' => []
             ], 404);
         }
 
-        // Ambil semua materi dari kelas tersebut
         $materi = Materi::with('kelas')
             ->where('kelas_id', $kelas_id)
             ->orderBy('created_at', 'asc')
             ->get()
             ->map(function ($m) {
-                $m->kelas_nama = $m->kelas ? $m->kelas->nama : null;
-                return $m;
+                return [
+                    'id' => $m->id,
+                    'judul' => $m->judul,
+                    'deskripsi' => $m->deskripsi,
+                    'konten' => $m->konten,
+                    'kelas_id' => $m->kelas_id,
+                    'kelas_nama' => $m->kelas ? $m->kelas->nama : null,
+                    'created_at' => $m->created_at,
+                    'updated_at' => $m->updated_at,
+                ];
             });
 
         return response()->json([

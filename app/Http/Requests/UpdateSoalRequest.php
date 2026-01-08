@@ -11,7 +11,7 @@ class UpdateSoalRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,13 @@ class UpdateSoalRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'materi_id' => 'sometimes|exists:materis,id',
+            'pertanyaan' => 'sometimes|string',
+            'jawaban_a' => 'sometimes|string',
+            'jawaban_b' => 'sometimes|string',
+            'jawaban_c' => 'sometimes|string',
+            'jawaban_d' => 'sometimes|string',
+            'jawaban_benar' => 'sometimes|in:a,b,c,d',
         ];
     }
 }

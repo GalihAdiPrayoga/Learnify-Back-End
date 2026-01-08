@@ -11,7 +11,7 @@ class StoreSoalRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,13 @@ class StoreSoalRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'materi_id' => 'required|exists:materis,id',
+            'pertanyaan' => 'required|string',
+            'jawaban_a' => 'required|string',
+            'jawaban_b' => 'required|string',
+            'jawaban_c' => 'required|string',
+            'jawaban_d' => 'required|string',
+            'jawaban_benar' => 'required|in:a,b,c,d',
         ];
     }
 }
