@@ -53,5 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/hasil-ujian/start', [HasilUjianController::class, 'start']);
         Route::post('/jawaban', [JawabanUserController::class, 'store']);
         Route::post('/hasil-ujian/finish', [HasilUjianController::class, 'finish']);
+        Route::get('/hasil-ujian/{id}', [HasilUjianController::class, 'show']);
+        Route::get('/hasil-ujian', [HasilUjianController::class, 'userHistory']);
     });
 });

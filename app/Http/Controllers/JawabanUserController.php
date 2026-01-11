@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\JawabanUser;
+use App\Models\Soal;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class JawabanUserController extends Controller
 {
@@ -28,7 +30,32 @@ class JawabanUserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'hasil_ujian_id' => 'required|exists:hasil_ujians,id',
+            'soal_id' => 'required|exists:soals,id',
+            'jawaban_user' => 'required|string',
+        ]);
+
+        $soal = Soal::find($request->soal_id);
+        $benar = ($request->jawaban_user === $soal->jawaban_benar);
+
+        $jawaban = JawabanUser::updateOrCreate(
+            [
+                'hasil_ujian_id' => $request->hasil_ujian_id,
+                'soal_id' => $request->soal_id,
+                'user_id' => Auth::id(),
+            ],
+            [
+                'jawaban_user' => $request->jawaban_user,
+                'jawaban_benar' => $benar,
+            ]
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Jawaban disimpan',
+            'data' => $jawaban
+        ], 201);
     }
 
     /**
