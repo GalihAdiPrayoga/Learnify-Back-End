@@ -89,6 +89,21 @@ class HasilUjianController extends Controller
     {
         $request->validate(['materi_id' => 'required|exists:materis,id']);
 
+        // ✅ Guard: cek apakah sudah ada session aktif (dalam 1 jam terakhir)
+        $existing = HasilUjian::where('user_id', Auth::id())
+            ->where('materi_id', $request->materi_id)
+            ->where('created_at', '>=', now()->subHour())
+            ->where('nilai', 0) // session yang belum finish
+            ->first();
+
+        if ($existing) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Melanjutkan sesi ujian yang ada',
+                'data' => $existing
+            ]);
+        }
+
         $soalCount = Soal::where('materi_id', $request->materi_id)->count();
 
         $hasil = HasilUjian::create([
@@ -118,6 +133,15 @@ class HasilUjianController extends Controller
 
         if (!$hasil || $hasil->user_id !== Auth::id()) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // ✅ Guard LEBIH KETAT: cek nilai DAN updated_at
+        if ($hasil->nilai > 0 || $hasil->jumlah_benar > 0 || $hasil->updated_at->diffInSeconds($hasil->created_at) > 5) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Ujian sudah selesai sebelumnya',
+                'data' => $hasil
+            ]);
         }
 
         $jumlahBenar = $hasil->jawabanUsers->where('jawaban_benar', true)->count();
