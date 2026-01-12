@@ -135,12 +135,28 @@ class HasilUjianController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
-        // ✅ Guard LEBIH KETAT: cek nilai DAN updated_at
+        $forceFail = (bool) $request->input('force_fail', false);
+
+        // If already finished, return existing (keep previous guard)
         if ($hasil->nilai > 0 || $hasil->jumlah_benar > 0 || $hasil->updated_at->diffInSeconds($hasil->created_at) > 5) {
             return response()->json([
                 'success' => true,
                 'message' => 'Ujian sudah selesai sebelumnya',
                 'data' => $hasil
+            ]);
+        }
+
+        // If time expired and caller requested force-fail, mark as failed (0 score)
+        if ($forceFail) {
+            $hasil->update([
+                'jumlah_benar' => 0,
+                'nilai' => 0,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Waktu habis. Ujian dinyatakan gagal.',
+                'data' => $hasil->fresh(['jawabanUsers.soal'])
             ]);
         }
 
