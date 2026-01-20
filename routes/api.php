@@ -8,6 +8,7 @@ use App\Http\Controllers\SoalController;
 use App\Http\Controllers\HasilUjianController;
 use App\Http\Controllers\JawabanUserController;
 use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\DashboardController;
 
 // Public routes
 Route::post('/registrasi', [AuthController::class, 'register']);
@@ -27,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Admin routes
     Route::middleware('role:Admin')->group(function () {
+        Route::get('dashboard', [DashboardController::class, 'index']);
         Route::apiResource('profil', ProfilController::class);
         Route::apiResource('kelas', KelasController::class)->parameters(['kelas' => 'kelas']);
         Route::apiResource('materi', MateriController::class);
